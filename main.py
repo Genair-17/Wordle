@@ -5,9 +5,8 @@ import random
 
 ''' Primero se elegie la palabra misteriosa desde un documento con 14855 palabras de 5 letras '''
 def obtener_palabra ():
-    x = random.randint(1, 2315)
-    line = linecache.getline("wordles.txt",x)
-    #print(line.rstrip())
+    num = random.randint(1, 2315)
+    line = linecache.getline("wordles.txt",num)
     return line.rstrip()
     
 '''Luego se pediria al usuario una palabra de 5 letras '''
@@ -51,19 +50,16 @@ def guess_decompose(guess):
 def letter_compare(guess_list, word_list,num):
     if (guess_list[num] == word_list[num]):
         letter_state = "correct"
-        description = "esta en la palabra y posicion correcta"
     elif ((guess_list[num] == word_list[0]) or (guess_list[num] == word_list[1]) or (guess_list[num] == word_list[2]) or (guess_list[num] == word_list[3]) or (guess_list[num] == word_list[4])):
         letter_state = "partial"
-        description = "esta en la palabra pero no en la posicion correcta"
     else:
         letter_state = "incorrect"
-        description = "no esta en la palabra"
 
     return letter_state 
 
     
-'''Si la letra existe en la palabra pero no esta en la misma posicion que en la original se colorea de amarillo
-Si la letra esta en la posicion correcta se colorea de verde'''
+'''Si la letra existe en la palabra pero no esta en la misma posicion que en la original se colorea de amarillo,
+si la letra esta en la posicion correcta se colorea de verde'''
 
 def letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts):
     YELLOW = '\033[33m'
@@ -109,6 +105,19 @@ def letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, l
     print(f"{hint_letter_0}{hint_letter_1}{hint_letter_2}{hint_letter_3}{hint_letter_4} <--Attempt number:", attempts)
 
 
+def asigns_state(guess_list, word_list): 
+
+    letter_0_state = letter_compare(guess_list,word_list,0)
+    letter_1_state = letter_compare(guess_list,word_list,1)
+    letter_2_state = letter_compare(guess_list,word_list,2)
+    letter_3_state = letter_compare(guess_list,word_list,3)
+    letter_4_state = letter_compare(guess_list,word_list,4) 
+
+    letter_state_list = [letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state]
+    return letter_state_list
+
+    
+
 def hint(word_list, guess_list, attempts):
 
     '''compara cada letra del guess con cada letra de la palabra misteriosa'''
@@ -119,8 +128,13 @@ def hint(word_list, guess_list, attempts):
     letter_4_state = letter_compare(guess_list,word_list,4)
 
 
-    if (letter_0_state == "correct") and (letter_1_state == "correct") and (letter_2_state == "correct") and (letter_3_state == "correct") and (letter_4_state == "correct"):
-        letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state)
+    if ((letter_0_state == "correct") and 
+        (letter_1_state == "correct") and 
+        (letter_2_state == "correct") and 
+        (letter_3_state == "correct") and 
+        (letter_4_state == "correct")):
+        
+        letter_coloring(guess_list, letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts)
         veredict = "win"
 
     else:
@@ -173,17 +187,49 @@ def hint(word_list, guess_list, attempts):
                 letter_3_state = "incocorrect"  
 
         letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts)
-    
-
         veredict = "lose"
+
     return veredict
 
 
 '''
 ##FALTA##
-#Sistema de puntos (pendiente)
+#Cambiar sistema de hint para que sea por lista y poder integrar una función
 ##FALTA#
 '''
+
+#Puntos: * a los cuantos intentos se logro la palabra = base de los puntos
+def suma_puntos_attempts(attempts):
+    attempts = attempts -1
+
+    if attempts == 1:
+        puntos = 50
+    elif attempts == 2:
+        puntos = 40
+    elif attempts == 3:
+        puntos = 30
+    elif attempts == 4:
+        puntos = 20
+    elif attempts == 5:
+        puntos = 10
+    return puntos
+
+#        * cuantas palabras amarillas = x cantidad de puntos
+#        * cuantas palabras verdes = x+ cantidad de puntos
+def suma_puntos_letras(guess_list, word_list):
+    letter_state_list = asigns_state(guess_list, word_list)
+    puntos = 0
+    for x in letter_state_list:
+        if x == "correct":
+            puntos = puntos + 4
+        if x == "partial":
+            puntos = puntos + 2
+        if x == "incorrect":
+            puntos = puntos 
+    return puntos
+
+#        * crear archivo con log de intentos y puntos
+
 
 
 print("Bienvenido a wordle, hay una palabra misteriosa de 5 letras que tienes que encontrar,")
@@ -193,12 +239,15 @@ print("verde = la letra este en la palabra y en el lugar indicado")
 print("blanco = la letra no esta en la palabra")
 print("El juego de wordle se juega en ingles")
 
-attempts = 0
-word = obtener_palabra() 
 
+#word = obtener_palabra() 
+word = "music"
 """se repite el proceso de pedir palabra y checar hasta que haya sucedido el ciclo 5 veces (5 intentos) """
 attempts = 1
-while attempts < 6:
+veredict = "lose"
+puntos = 0 
+
+while attempts < 6 and veredict == "lose":
 
     guess = user_guess ()    
     valid_word = letter_count(guess)
@@ -209,20 +258,19 @@ while attempts < 6:
 
         guess_list = guess_decompose(guess)
 
-        veredict = hint(word_list,guess_list, attempts)
+        veredict = hint(word_list, guess_list, attempts)
 
+        puntos = puntos + suma_puntos_letras(guess_list, word_list)
         attempts = attempts +1
 
-        if veredict == "win": 
-            '''El ciclo se interrumpe si todas las letras son verdes y el usuario gana'''
-            print("you win !")
-            attempts = 7
-            
+if veredict == "win": 
+    print("you win !")
+    puntos = puntos + suma_puntos_letras(guess_list, word_list)
 
-if attempts == 6:
-    if veredict == "win":
-        print("you win !")
-    else: 
-        '''si el ciclo termina y no ha adivinado la palabra se revela la palabra y el usuario pierde'''
-        print("you lose, the word was", word)
+else: 
+    '''si el ciclo termina y no ha adivinado la palabra se revela la palabra y el usuario pierde'''
+    print("you lose, the word was", word)
 
+
+puntos = puntos + suma_puntos_attempts(attempts)
+print("puntos: ", puntos)
