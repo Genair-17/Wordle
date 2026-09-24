@@ -25,7 +25,8 @@ def real_word_check(word):
         return "wrong"
 
 
-'''Checa que sea de 5 letras (implemente la otra funcion para poder repetir hasta que el usuaro introduzca una respuesta valida)'''
+'''Checa que sea de 5 letras (implemente la otra funcion para poder repetir 
+hasta que el usuaro introduzca una respuesta valida)'''
 def letter_count (guess):
     guess_num = len(guess)
     if (guess_num == 5):
@@ -50,7 +51,11 @@ def guess_decompose(guess):
 def letter_compare(guess_list, word_list,num):
     if (guess_list[num] == word_list[num]):
         letter_state = "correct"
-    elif ((guess_list[num] == word_list[0]) or (guess_list[num] == word_list[1]) or (guess_list[num] == word_list[2]) or (guess_list[num] == word_list[3]) or (guess_list[num] == word_list[4])):
+    elif ((guess_list[num] == word_list[0]) or 
+          (guess_list[num] == word_list[1]) or 
+          (guess_list[num] == word_list[2]) or 
+          (guess_list[num] == word_list[3]) or 
+          (guess_list[num] == word_list[4])):
         letter_state = "partial"
     else:
         letter_state = "incorrect"
@@ -133,12 +138,13 @@ def hint(word_list, guess_list, attempts):
         (letter_2_state == "correct") and 
         (letter_3_state == "correct") and 
         (letter_4_state == "correct")):
-        
+
         letter_coloring(guess_list, letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts)
         veredict = "win"
 
     else:
-        '''Se hacen excepciones a las letras que ya fueron designadas como correctas, se colorean de gris, para evitar confusiones'''
+        '''Se hacen excepciones a las letras que ya fueron designadas como correctas, 
+        se colorean de gris, para evitar confusiones'''
 
         if (letter_0_state == "correct"):
             if (guess_list[0] == guess_list[1]):
@@ -240,9 +246,10 @@ print("blanco = la letra no esta en la palabra")
 print("El juego de wordle se juega en ingles")
 
 
-#word = obtener_palabra() 
-word = "music"
+word = obtener_palabra() 
+
 """se repite el proceso de pedir palabra y checar hasta que haya sucedido el ciclo 5 veces (5 intentos) """
+
 attempts = 1
 veredict = "lose"
 puntos = 0 
