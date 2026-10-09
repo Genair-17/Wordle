@@ -2,21 +2,25 @@
 import linecache
 import random
 
+YELLOW = '\033[33m'
+GREEN = '\033[32m'
+RESET = '\033[0m'
 
 ''' Primero se elegie la palabra misteriosa desde un documento con 14855 palabras de 5 letras '''
-def obtener_palabra ():
+def obtener_palabra():
     num = random.randint(1, 2315)
-    line = linecache.getline("wordles.txt",num)
+    line = linecache.getline("wordles.txt", num)
     return line.rstrip()
     
 '''Luego se pediria al usuario una palabra de 5 letras '''
-def user_guess ():
+def user_guess():
     guess = str(input())
+    guess = guess.lower()
     return guess
 
 '''Checa que sea una palabra real comparandola con el archivo'''
 def real_word_check(word):
-    words = open("allowed.txt","r")
+    words = open("allowed.txt", "r")
     content = words.read()
     if word in content:
         return word
@@ -27,7 +31,7 @@ def real_word_check(word):
 
 '''Checa que sea de 5 letras (implemente la otra funcion para poder repetir 
 hasta que el usuaro introduzca una respuesta valida)'''
-def letter_count (guess):
+def letter_count(guess):
     guess_num = len(guess)
     if (guess_num == 5):
         guess = real_word_check(guess)
@@ -48,7 +52,7 @@ def guess_decompose(guess):
 
 '''checa una letra del "guess" ante todas las letras de la palabra misteriosa'''
 
-def letter_compare(guess_list, word_list,num):
+def letter_compare(guess_list, word_list, num):
     if (guess_list[num] == word_list[num]):
         letter_state = "correct"
     elif ((guess_list[num] == word_list[0]) or 
@@ -66,10 +70,13 @@ def letter_compare(guess_list, word_list,num):
 '''Si la letra existe en la palabra pero no esta en la misma posicion que en la original se colorea de amarillo,
 si la letra esta en la posicion correcta se colorea de verde'''
 
-def letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts):
-    YELLOW = '\033[33m'
-    GREEN = '\033[32m'
-    RESET = '\033[0m'
+def letter_coloring(guess_list, 
+                    letter_0_state, 
+                    letter_1_state, 
+                    letter_2_state, 
+                    letter_3_state, 
+                    letter_4_state, 
+                    attempts):
 
     if (letter_0_state == "correct"):
         hint_letter_0 = f"{GREEN}{guess_list[0]}{RESET}"
@@ -106,118 +113,89 @@ def letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, l
         hint_letter_4 = f"{YELLOW}{guess_list[4]}{RESET}"
     else:
         hint_letter_4 = guess_list[4]
-
+ 
     print(f"{hint_letter_0}{hint_letter_1}{hint_letter_2}{hint_letter_3}{hint_letter_4} <--Attempt number:", attempts)
 
 
 def asigns_state(guess_list, word_list): 
 
-    letter_0_state = letter_compare(guess_list,word_list,0)
-    letter_1_state = letter_compare(guess_list,word_list,1)
-    letter_2_state = letter_compare(guess_list,word_list,2)
-    letter_3_state = letter_compare(guess_list,word_list,3)
-    letter_4_state = letter_compare(guess_list,word_list,4) 
+    letter_0_state = letter_compare(guess_list, word_list, 0)
+    letter_1_state = letter_compare(guess_list, word_list, 1)
+    letter_2_state = letter_compare(guess_list, word_list, 2)
+    letter_3_state = letter_compare(guess_list, word_list, 3)
+    letter_4_state = letter_compare(guess_list, word_list, 4) 
 
     letter_state_list = [letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state]
     return letter_state_list
+
+
+def makes_exeptions(letter_state_list, guess_list, num_exepcion, num1, num2, num3, num4):
+
+    if (letter_state_list[num_exepcion] == "correct"):
+
+        if (guess_list[num_exepcion] == guess_list[num1]) and (letter_state_list[num1] != "correct"):
+            letter_state_list[num1] = "incorrect"
+
+        elif (guess_list[num_exepcion] == guess_list[num2]) and (letter_state_list[num2] != "correct"):
+            letter_state_list[num2] = "incorrect"
+
+        elif (guess_list[num_exepcion] == guess_list[num3]) and (letter_state_list[num3] != "correct"):
+            letter_state_list[num3] = "incorrect"     
+
+        elif (guess_list[num_exepcion] == guess_list[num4]) and (letter_state_list[num4] != "correct"):
+            letter_state_list[num4] = "incorrect"
+
+    return letter_state_list[num1], letter_state_list[num2], letter_state_list[num3], letter_state_list[num4]
 
     
 
 def hint(word_list, guess_list, attempts):
 
-    '''compara cada letra del guess con cada letra de la palabra misteriosa'''
-    letter_0_state = letter_compare(guess_list,word_list,0)
-    letter_1_state = letter_compare(guess_list,word_list,1)
-    letter_2_state = letter_compare(guess_list,word_list,2)
-    letter_3_state = letter_compare(guess_list,word_list,3)
-    letter_4_state = letter_compare(guess_list,word_list,4)
+    letter_state_list = asigns_state(guess_list, word_list)
 
 
-    if ((letter_0_state == "correct") and 
-        (letter_1_state == "correct") and 
-        (letter_2_state == "correct") and 
-        (letter_3_state == "correct") and 
-        (letter_4_state == "correct")):
+    if ((letter_state_list[0] == "correct") and 
+        (letter_state_list[1] == "correct") and 
+        (letter_state_list[2] == "correct") and 
+        (letter_state_list[3] == "correct") and 
+        (letter_state_list[4] == "correct")):
 
-        letter_coloring(guess_list, letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts)
+        letter_coloring(guess_list, letter_state_list[0], letter_state_list[1], 
+                        letter_state_list[2], letter_state_list[3], letter_state_list[4], attempts)
         veredict = "win"
 
     else:
         '''Se hacen excepciones a las letras que ya fueron designadas como correctas, 
         se colorean de gris, para evitar confusiones'''
 
-        if (letter_0_state == "correct"):
-            if (guess_list[0] == guess_list[1]):
-                letter_1_state = "incocorrect"
-            elif (guess_list[0] == guess_list[2]):
-                letter_2_state = "incocorrect"
-            elif (guess_list[0] == guess_list[3]):
-                letter_3_state = "incocorrect"     
-            elif (guess_list[0] == guess_list[4]):
-                letter_4_state = "incocorrect"
-        elif(letter_1_state == "correct"):
-            if (guess_list[1] == guess_list[0]):
-                letter_0_state = "incocorrect"
-            elif (guess_list[1] == guess_list[2]):
-                letter_2_state = "incocorrect"
-            elif (guess_list[1] == guess_list[3]):
-                letter_3_state = "incocorrect"     
-            elif (guess_list[1] == guess_list[4]):
-                letter_4_state = "incocorrect"        
-        elif(letter_2_state == "correct"):
-            if (guess_list[2] == guess_list[0]):
-                letter_0_state = "incocorrect"
-            elif (guess_list[2] == guess_list[1]):
-                letter_1_state = "incocorrect"
-            elif (guess_list[2] == guess_list[3]):
-                letter_3_state = "incocorrect"     
-            elif (guess_list[2] == guess_list[4]):
-                letter_4_state = "incocorrect"  
-        elif(letter_3_state == "correct"):
-            if (guess_list[3] == guess_list[0]):
-                letter_0_state = "incocorrect"
-            elif (guess_list[3] == guess_list[1]):
-                letter_1_state = "incocorrect"
-            elif (guess_list[3] == guess_list[2]):
-                letter_2_state = "incocorrect"     
-            elif (guess_list[3] == guess_list[4]):
-                letter_4_state = "incocorrect"  
-        elif(letter_4_state == "correct"):
-            if (guess_list[4] == guess_list[0]):
-                letter_0_state = "incocorrect"
-            elif (guess_list[4] == guess_list[1]):
-                letter_1_state = "incocorrect"
-            elif (guess_list[4] == guess_list[2]):
-                letter_2_state = "incocorrect"     
-            elif (guess_list[4] == guess_list[3]):
-                letter_3_state = "incocorrect"  
+        letter_state_list[1], letter_state_list[2], letter_state_list[3], letter_state_list[4] = makes_exeptions(letter_state_list,guess_list,0,1,2,3,4)
+        letter_state_list[0], letter_state_list[2], letter_state_list[3], letter_state_list[4] = makes_exeptions(letter_state_list,guess_list,1,0,2,3,4)
+        letter_state_list[0], letter_state_list[1], letter_state_list[3], letter_state_list[4] = makes_exeptions(letter_state_list,guess_list,2,0,1,3,4)
+        letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[4] = makes_exeptions(letter_state_list,guess_list,3,0,1,2,4)
+        letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[3] = makes_exeptions(letter_state_list,guess_list,4,0,1,2,3)
 
-        letter_coloring(guess_list,letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state, attempts)
-        veredict = "lose"
+        letter_coloring(guess_list, letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[3], letter_state_list[4], attempts)
+        veredict = "lose"   
 
     return veredict
 
 
-'''
-##FALTA##
-#Cambiar sistema de hint para que sea por lista y poder integrar una función
-##FALTA#
-'''
-
 #Puntos: * a los cuantos intentos se logro la palabra = base de los puntos
-def suma_puntos_attempts(attempts):
-    attempts = attempts -1
+def suma_puntos_attempts(attempts, puntos):
+    attempts = attempts - 1
 
     if attempts == 1:
-        puntos = 50
+        puntos = int(puntos + 60)
     elif attempts == 2:
-        puntos = 40
+        puntos = int(puntos + 50)
     elif attempts == 3:
-        puntos = 30
+        puntos = int(puntos + 40)
     elif attempts == 4:
-        puntos = 20
+        puntos = int(puntos + 30)
     elif attempts == 5:
-        puntos = 10
+        puntos = int(puntos + 20)
+    elif attempts == 6:
+        puntos = int(puntos + 10)
     return puntos
 
 #        * cuantas palabras amarillas = x cantidad de puntos
@@ -230,54 +208,63 @@ def suma_puntos_letras(guess_list, word_list):
             puntos = puntos + 4
         if x == "partial":
             puntos = puntos + 2
-        if x == "incorrect":
-            puntos = puntos 
+ 
     return puntos
 
 #        * crear archivo con log de intentos y puntos
 
 
+def main():
+    print("Bienvenido a wordle, \nhay una palabra misteriosa de 5 letras que tienes que encontrar," 
+    "\npara esto escribe palabras de 5 letras y te indicaremos con colores algunas pistas para ayudarte"
+    "\namarillo = la letra esta en la palabra pero no en el lugar que indicaste"
+    "\nverde = la letra este en la palabra y en el lugar indicado"
+    "\nblanco = la letra no esta en la palabra"
+    "\nEl juego de wordle se juega en ingles")
 
-print("Bienvenido a wordle, hay una palabra misteriosa de 5 letras que tienes que encontrar,")
-print("para esto escribe palabras de 5 letras y te indicaremos con colores algunas pistas para ayudarte")
-print("amarillo = la letra esta en la palabra pero no en el lugar que indicaste")
-print("verde = la letra este en la palabra y en el lugar indicado")
-print("blanco = la letra no esta en la palabra")
-print("El juego de wordle se juega en ingles")
 
 
-word = obtener_palabra() 
+    """se repite el proceso de pedir palabra y checar hasta que haya sucedido el ciclo 5 veces (5 intentos) """
 
-"""se repite el proceso de pedir palabra y checar hasta que haya sucedido el ciclo 5 veces (5 intentos) """
+    word = obtener_palabra() 
+    attempts = 1
+    veredict = "lose"
+    puntos = 0 
 
-attempts = 1
-veredict = "lose"
-puntos = 0 
+    while attempts < 7 and veredict == "lose":
 
-while attempts < 6 and veredict == "lose":
+        guess = user_guess()    
+        valid_word = letter_count(guess)
 
-    guess = user_guess ()    
-    valid_word = letter_count(guess)
+        if (valid_word != "wrong"):
 
-    if (valid_word != "wrong"):
+            word_list = word_decompose(word)
 
-        word_list = word_decompose(word)
+            guess_list = guess_decompose(guess)
 
-        guess_list = guess_decompose(guess)
+            veredict = hint(word_list, guess_list, attempts)
 
-        veredict = hint(word_list, guess_list, attempts)
+            puntos = puntos + suma_puntos_letras(guess_list, word_list)
+            attempts = attempts + 1
 
+    if veredict == "win": 
+        print("you win !")
         puntos = puntos + suma_puntos_letras(guess_list, word_list)
-        attempts = attempts +1
 
-if veredict == "win": 
-    print("you win !")
-    puntos = puntos + suma_puntos_letras(guess_list, word_list)
-
-else: 
-    '''si el ciclo termina y no ha adivinado la palabra se revela la palabra y el usuario pierde'''
-    print("you lose, the word was", word)
+    else: 
+        '''si el ciclo termina y no ha adivinado la palabra se revela la palabra y el usuario pierde'''
+        print("you lose, the word was", word)
 
 
-puntos = puntos + suma_puntos_attempts(attempts)
-print("puntos: ", puntos)
+    if puntos > 100:
+        putnos = 100
+
+    puntos = suma_puntos_attempts(attempts,puntos)
+    print("puntos: ", puntos)
+
+main()
+
+ans = input("quieres jugar de nuevo ? Y/N\n")
+
+if ans == "Y":
+    main()
