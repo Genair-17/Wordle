@@ -212,7 +212,17 @@ def suma_puntos_letras(guess_list, word_list):
     return puntos
 
 #        * crear archivo con log de intentos y puntos
+def abre_archivo():
+    f = open("registro.txt", "r")
+    print(f.read())
+    f.close()
 
+def escribe_score(puntos):
+    puntos = str(puntos)
+    nombre = str(input("escribe tu nombre\n"))
+    f = open("registro.txt", "a")
+    f.write("Nombre:"+ " " + nombre + ",  " + "puntaje: " + " "+ puntos + "\n")
+    f.close()
 
 def main():
     print("Bienvenido a wordle, \nhay una palabra misteriosa de 5 letras que tienes que encontrar," 
@@ -261,10 +271,20 @@ def main():
 
     puntos = suma_puntos_attempts(attempts,puntos)
     print("puntos: ", puntos)
+    return puntos
 
-main()
+puntos = main()
 
-ans = input("quieres jugar de nuevo ? Y/N\n")
+ans_2 = input("Quieres guardar tu puntaje? S/N\n")
 
-if ans == "Y":
+if ans_2 == "S":
+    escribe_score(puntos)
+    print("El registro de puntajes es:")
+    abre_archivo()
+
+
+ans_1 = input("quieres jugar de nuevo ? S/N\n")
+
+if ans_1 == "S":
     main()
+
