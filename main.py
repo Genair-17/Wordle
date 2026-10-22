@@ -71,61 +71,29 @@ def letter_compare(guess_list, word_list, num):
 si la letra esta en la posicion correcta se colorea de verde'''
 
 def letter_coloring(guess_list, 
-                    letter_0_state, 
-                    letter_1_state, 
-                    letter_2_state, 
-                    letter_3_state, 
-                    letter_4_state, 
+                    letter_state_list, 
                     attempts):
+    hint_letter_list = []
 
-    if (letter_0_state == "correct"):
-        hint_letter_0 = f"{GREEN}{guess_list[0]}{RESET}"
-    elif (letter_0_state == "partial"):
-        hint_letter_0 = f"{YELLOW}{guess_list[0]}{RESET}"
-    else:
-        hint_letter_0 = guess_list[0]
+    for i in range(5):
+        if (letter_state_list[i]== "correct"):
+            hint_letter_list.append(f"{GREEN}{guess_list[i]}{RESET}")
+        elif (letter_state_list[i] == "partial"):
+            hint_letter_list.append(f"{YELLOW}{guess_list[i]}{RESET}")
+        else:
+            hint_letter_list.append(guess_list[i])
 
-    if (letter_1_state == "correct"):
-        hint_letter_1 = f"{GREEN}{guess_list[1]}{RESET}"
-
-    elif (letter_1_state == "partial"):
-        hint_letter_1 = f"{YELLOW}{guess_list[1]}{RESET}"
-    else:
-        hint_letter_1 = guess_list[1]
-
-    if (letter_2_state == "correct"):
-        hint_letter_2 = f"{GREEN}{guess_list[2]}{RESET}"
-    elif (letter_2_state == "partial"):
-        hint_letter_2 = f"{YELLOW}{guess_list[2]}{RESET}"
-    else:
-        hint_letter_2 = guess_list[2]
-
-    if (letter_3_state == "correct"):
-        hint_letter_3 = f"{GREEN}{guess_list[3]}{RESET}"
-    elif (letter_3_state == "partial"):
-        hint_letter_3 = f"{YELLOW}{guess_list[3]}{RESET}"
-    else:
-        hint_letter_3 = guess_list[3]
-
-    if (letter_4_state == "correct"):
-        hint_letter_4 = f"{GREEN}{guess_list[4]}{RESET}"
-    elif (letter_4_state == "partial"):
-        hint_letter_4 = f"{YELLOW}{guess_list[4]}{RESET}"
-    else:
-        hint_letter_4 = guess_list[4]
  
-    print(f"{hint_letter_0}{hint_letter_1}{hint_letter_2}{hint_letter_3}{hint_letter_4} <--Attempt number:", attempts)
+    print(f"{hint_letter_list[0]}{hint_letter_list[1]}{hint_letter_list[2]}{hint_letter_list[3]}{hint_letter_list[4]} <--Attempt number:", attempts)
 
 
 def asigns_state(guess_list, word_list): 
 
-    letter_0_state = letter_compare(guess_list, word_list, 0)
-    letter_1_state = letter_compare(guess_list, word_list, 1)
-    letter_2_state = letter_compare(guess_list, word_list, 2)
-    letter_3_state = letter_compare(guess_list, word_list, 3)
-    letter_4_state = letter_compare(guess_list, word_list, 4) 
+    letter_state_list = []
+    lenght = len(guess_list)
+    for i in range(lenght):
+        letter_state_list.append(letter_compare(guess_list, word_list, i))
 
-    letter_state_list = [letter_0_state, letter_1_state, letter_2_state, letter_3_state, letter_4_state]
     return letter_state_list
 
 
@@ -174,7 +142,7 @@ def hint(word_list, guess_list, attempts):
         letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[4] = makes_exeptions(letter_state_list,guess_list,3,0,1,2,4)
         letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[3] = makes_exeptions(letter_state_list,guess_list,4,0,1,2,3)
 
-        letter_coloring(guess_list, letter_state_list[0], letter_state_list[1], letter_state_list[2], letter_state_list[3], letter_state_list[4], attempts)
+        letter_coloring(guess_list, letter_state_list, attempts)
         veredict = "lose"   
 
     return veredict
