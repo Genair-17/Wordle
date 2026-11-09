@@ -83,8 +83,9 @@ def letter_coloring(guess_list,
         else:
             hint_letter_list.append(guess_list[i])
 
- 
-    print(f"{hint_letter_list[0]}{hint_letter_list[1]}{hint_letter_list[2]}{hint_letter_list[3]}{hint_letter_list[4]} <--Attempt number:", attempts)
+    hint = "".join(hint_letter_list)
+
+    print(f"{hint} <--Attempt number:", attempts)
 
 
 def asigns_state(guess_list, word_list): 
@@ -128,8 +129,7 @@ def hint(word_list, guess_list, attempts):
         (letter_state_list[3] == "correct") and 
         (letter_state_list[4] == "correct")):
 
-        letter_coloring(guess_list, letter_state_list[0], letter_state_list[1], 
-                        letter_state_list[2], letter_state_list[3], letter_state_list[4], attempts)
+        letter_coloring(guess_list,letter_state_list, attempts)
         veredict = "win"
 
     else:
