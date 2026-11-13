@@ -41,11 +41,11 @@ def letter_count(guess):
         return "wrong"
     
 '''Primero descompone las palabras letra por letra en una lista'''
-
+# manipulacion de cadenas
 def word_decompose(word):
     word_list = list(word)
     return word_list
-
+# manipulacion de cadenas
 def guess_decompose(guess):
     guess_list = list(guess)
     return guess_list
